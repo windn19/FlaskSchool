@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Edit class</h2>
+    <form method="POST">
+        <label for="name">Название класса</label>
+        <input type="text" name="name" placeholder="Например, 1а" value="{{ cl }}">
+        <label for="count">Количество учеников</label>
+        <input type="text" name="count" placeholder="Например, 25" value="{{ count }}">
+        <button type="submit">Edit</button>
+    </form>
+    <label>{{ cl }}</label>
+    <form>
+        <button formaction="{{ url_for('delete', idx=cl) }}">Delete</button>
+    </form>
+{% endblock %}

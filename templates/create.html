@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Create class</h2>
+    <form method="POST">
+        <label for="name">Название класса</label>
+        <input type="text" name="name" placeholder="Например, 1а">
+        <label for="count">Количество учеников</label>
+        <input type="text" name="count" placeholder="Например, 25">
+        <button type="submit">Создать</button>
+    </form>
+{% endblock %}
