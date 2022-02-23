@@ -1,8 +1,5 @@
 from flask import Flask, render_template, jsonify, request, flash, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
-from os.path import exists
-import pickle
-from dd import create_school
 
 
 app = Flask(__name__)
@@ -56,8 +53,8 @@ def create():
         print('Here')
         name = request.form.get('name').strip()
         amount = request.form.get('count').strip()
-        school[name] = amount
-        save_data()
+        db.session.add(School(name, amount))
+        db.session.commit()
         flash(f'Создан класс {name}, а в нем {amount}  учеников')
         return redirect(url_for('start'))
     return render_template('create.html')
@@ -71,12 +68,14 @@ def show():
 
 @app.route('/<id>/edit', methods=('GET', 'POST'))
 def edit(id):
-    val = school[id]
+    cls = School.query.filter_by(name=id).first()
+    val = cls.amount
     if request.method == 'POST':
         c = request.form.get('name')
         a = request.form.get('count')
-        school[c] = a
-        save_data()
+        cls.name = c
+        cls.amount = a
+        db.session.commit()
         flash(f'Отредактирован класс {c}, теперь в нем {a}  учеников')
         return redirect(url_for('show'))
     return render_template('edit.html', cl=id, count=val)
@@ -85,8 +84,8 @@ def edit(id):
 @app.route('/<idx>/delete')
 def delete(idx):
     flash(f'Удален класс {idx}')
-    school.pop(idx)
-    save_data()
+    db.session.delete(School.query.filter_by(name=idx).first())
+    db.session.commit()
     return redirect(url_for('show'))
 
 
@@ -95,8 +94,8 @@ def json_create():
     new = request.get_json()
     c = new['class']
     a = new['count']
-    school[c] = a
-    save_data()
+    db.session.add(School(c, a))
+    db.session.commit()
     return jsonify({'action': 'add',
                     'driver': {'class': c,
                                'amount': a}})
@@ -108,9 +107,10 @@ def json_edit():
     old_key = new['old_key']
     new_key = new['new_key']
     amount = new['amount']
-    school.pop(old_key)
-    school[new_key] = amount
-    save_data()
+    db.session.delete(School.query.filter_by(name=old_key).first())
+    db.session.commit()
+    db.session.add(School(new_key, amount))
+    db.session.commit()
     return jsonify({'action': 'edit',
                     'driver': {'class': new_key,
                                'amount': amount}})
@@ -120,16 +120,15 @@ def json_edit():
 def json_delete():
     new = request.get_json()
     key = new['key']
-    print(school)
-    print(key, type(key))
-    school.pop(key)
-    save_data()
+    db.session.delete(School.query.filter_by(name=key).first())
+    db.session.commit()
     return jsonify({'action': 'delete',
                     'driver': {'class': key}})
 
 
 @app.route('/json/show', methods=['GET'])
 def json_show():
+    all_cl = School.query
     return jsonify({'action': 'show',
-                    'driver': [{'class': c,
-                               'amount': a} for c, a in school.items()]})
+                    'driver': [{'class': obj.name,
+                               'amount': obj.amount} for obj in all_cl]})
