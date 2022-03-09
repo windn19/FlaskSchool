@@ -18,12 +18,24 @@
             <label>{{ count_st }}</label>
         </div>
     {% endif %}
-    <hr>
-    <form>
-        <button formaction="{{ url_for('create') }}">Создать</button>
-    </form>
-    <hr>
-    <form>
-        <button formaction="{{ url_for('show') }}">Показать</button>
-    </form>
+    {% if current_user.is_authenticated %}
+        <hr>
+        <form>
+            <button formaction="{{ url_for('create') }}">Создать</button>
+        </form>
+        <hr>
+        <form>
+            <button formaction="{{ url_for('show') }}">Показать</button>
+        </form>
+        <hr>
+    {% endif %}
+    {% if not current_user.is_authenticated %}
+        <form>
+            <button formaction="{{ url_for('login') }}">Войти</button>
+        </form>
+    {% else %}
+        <form>
+            <button formaction="{{ url_for('logout') }}">Выйти</button>
+        </form>
+    {% endif %}
 {% endblock %}

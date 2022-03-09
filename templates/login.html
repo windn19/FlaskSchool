@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form action="/login" method="post">
+    <input type="email" name="email"  placeholder="Email" autofocus="">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Войти</button>
+  </form>
+  <form>
+      <button formaction="{{ url_for('registration') }}">Регистрация</button>
+  </form>
+{% endblock %}

@@ -7,6 +7,13 @@
     <body>
         <div class="container">
             <h1>Our school</h1>
+            <div>
+                {% if current_user.is_authenticated %}
+                    <label>{{ current_user.name }}</label>
+                {% else %}
+                    <label>Anonimus</label>
+                {% endif %}
+            </div>
             {% for message in get_flashed_messages() %}
                 <div>
                     <font color="red">{{ message }}</font>
